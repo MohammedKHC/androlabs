@@ -57,7 +57,7 @@ protobufPlugin = "0.9.4"
 room = "2.7.2"
 slf4j = "2.0.9"
 zipflinger = "8.2.0"
-
+jsr305 = "3.0.2"
 [bundles]
 androidx-compose-ui-test = ["androidx-compose-ui-test", "androidx-compose-ui-testManifest"]
 
