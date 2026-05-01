@@ -118,17 +118,24 @@ internal fun HomeScreenLayout(
                 scrollBehavior = scrollBehavior,
                 contentType = contentType,
                 recentSearchQueriesUiState = recentSearchQueriesUiState,
+                searchBarState = searchBarState,
+                textFieldState = textFieldState,
                 onSearch = {
-                    if (it.isNotEmpty() && it.isNotBlank()) {
+                    if (it.isNotBlank()) {
                         onSearch(it)
                         scope.launch { searchBarState.animateToCollapsed() }
                     }
                 },
                 onLeadingIconClick = {
-                    // TODO: Why is this not working?
                     scope.launch { searchBarState.animateToCollapsed() }
                 },
-                onTrailingIconClick = onAccountButtonClick,
+                onTrailingIconClick = { expanded ->
+                    if (expanded) {
+                        textFieldState.setTextAndPlaceCursorAtEnd("")
+                    } else {
+                        onAccountButtonClick()
+                    }
+                },
                 onSearchItemClick = {
                     textFieldState.setTextAndPlaceCursorAtEnd(it)
                     scope.launch { searchBarState.animateToCollapsed() }
@@ -190,13 +197,15 @@ internal fun HomeScreenLayout(
                                     WindowInsetsSides.Horizontal
                                 )
                             )
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                            .clip(RoundedCornerShape(20.dp))
+                            .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 16.dp)
+                            .clip(RoundedCornerShape(16.dp))
                             .semantics { traversalIndex = 1f },
                     ) {
                         projectFeed(
                             feedState = labFeedUIState,
-                            onClick = onLabItemClick,
+                            onOpen = onLabItemClick,
+                            onRemove = { /*TODO*/ },
+                            onSetIcon = { /*TODO*/ },
                         )
                     }
                 }

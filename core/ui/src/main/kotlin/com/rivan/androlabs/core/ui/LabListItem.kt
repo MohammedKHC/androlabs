@@ -16,17 +16,17 @@
 
 package com.rivan.androlabs.core.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,19 +48,27 @@ import com.rivan.androlabs.core.designsystem.theme.AndrolabsTheme
 import com.rivan.androlabs.core.model.data.Lab
 import java.io.File
 
+// TODO: The padding between the leading content and the title text is variable.
+//  Fix this!
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LabListItem(
     lab: Lab,
-    onClick: () -> Unit,
+    index: Int,
+    count: Int,
+    onOpen: () -> Unit,
+    onRemove: () -> Unit,
+    onSetIcon: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var isDropdownMenuExpanded by remember { mutableStateOf(false) }
 
-    ListItem(
-        headlineContent = { Text(text = lab.title) },
-        modifier = modifier.clickable {
-            onClick()
-        },
+    SegmentedListItem(
+        onClick = onOpen,
+        onLongClick = { isDropdownMenuExpanded = true },
+        selected = isDropdownMenuExpanded,
+        shapes = ListItemDefaults.segmentedShapes(index, count),
+        modifier = modifier,
         supportingContent = {
             val supportingText: String = if (lab.extraTitle.isNotBlank() &&
                 lab.extraTitle.isNotEmpty()
@@ -84,7 +92,7 @@ fun LabListItem(
                 )
             } else {
                 val initials = lab.title
-                    .split(' ', limit = 2)
+                    .split(' ', limit = 1)
                     .mapNotNull { it.firstOrNull()?.toString() }
                     .reduce { acc, s -> acc + s }
 
@@ -117,16 +125,22 @@ fun LabListItem(
                     text = { Text(text = "Open") },
                     onClick = {
                         isDropdownMenuExpanded = false
-                        onClick()
+                        onOpen()
                     },
                 )
                 DropdownMenuItem(
                     text = { Text(text = "Set Custom Icon") },
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        isDropdownMenuExpanded = false
+                        onSetIcon()
+                    },
                 )
                 DropdownMenuItem(
                     text = { Text(text = "Remove from Recent") },
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        isDropdownMenuExpanded = false
+                        onRemove()
+                    },
                 )
             }
         },
@@ -134,7 +148,7 @@ fun LabListItem(
             // TODO: Use a proper color here for background
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
-    )
+    ) { Text(text = lab.title) }
 }
 
 @Preview
@@ -146,7 +160,11 @@ private fun ListItemPreview(
     AndrolabsTheme {
         LabListItem(
             lab = labs[1],
-            onClick = {},
+            index = 0,
+            count = 1,
+            onOpen = {},
+            onRemove = {},
+            onSetIcon = {},
         )
     }
 }

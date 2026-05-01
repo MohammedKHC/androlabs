@@ -1,12 +1,11 @@
 package com.rivan.androlabs.core.ui
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
@@ -16,12 +15,10 @@ import androidx.compose.ui.unit.dp
 import com.rivan.androlabs.core.designsystem.theme.AndrolabsTheme
 import com.rivan.androlabs.core.model.data.Lab
 
-// TODO: Rename onProjectResourcesCheckedChanged
 /**
  * An extension on [LazyGridScope] defining a feed with project resources.
  * Depending on the [feedState], this might emit no items.
  */
-@OptIn(ExperimentalFoundationApi::class)
 fun LazyGridScope.projectFeed(
     feedState: ProjectFeedUiState,
     onClick: () -> Unit,
@@ -33,7 +30,7 @@ fun LazyGridScope.projectFeed(
                 LabCard(
                     lab = userLabs,
                     onClick = onClick,
-                    modifier = Modifier.animateItemPlacement()
+                    modifier = Modifier.animateItem()
                 )
             }
         }
@@ -45,19 +42,27 @@ fun LazyGridScope.projectFeed(
  * An extension on [LazyListScope] defining a feed with project resources.
  * Depending on the [feedState], this might emit no items.
  */
-@OptIn(ExperimentalFoundationApi::class)
 fun LazyListScope.projectFeed(
     feedState: ProjectFeedUiState,
-    onClick: () -> Unit,
+    onOpen: () -> Unit,
+    onRemove: () -> Unit,
+    onSetIcon: () -> Unit,
 ) {
     when (feedState) {
         ProjectFeedUiState.Loading -> Unit
         is ProjectFeedUiState.Success -> {
-            items(feedState.feed, key = { it.id }) { userLab ->
+            itemsIndexed(
+                feedState.feed,
+                key = { _: Int, lab: Lab ->  lab.id },
+            ) { index, userLab ->
                 LabListItem(
                     lab = userLab,
-                    onClick = onClick,
-                    modifier = Modifier.animateItemPlacement()
+                    index = index,
+                    count = feedState.feed.size,
+                    onOpen = onOpen,
+                    onRemove = onRemove,
+                    onSetIcon = onSetIcon,
+                    modifier = Modifier.animateItem(),
                 )
             }
         }
